@@ -40,15 +40,15 @@ public final class Compass extends JavaPlugin implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 	}
 	
-	public void setMetadata(Metadatable object, String key, Object value, Plugin plugin) {
+	private void setMetadata(Metadatable object, String key, Object value, Plugin plugin) {
 		object.setMetadata(key, new FixedMetadataValue(plugin, value));
 	}
 	
-	public void removeMetadata(Metadatable object, String key, Plugin plugin) {
+	private void removeMetadata(Metadatable object, String key, Plugin plugin) {
 		object.removeMetadata(key, plugin);
 	}
 
-	public Object getMetadata(Metadatable object, String key, Plugin plugin) {
+	private Object getMetadata(Metadatable object, String key, Plugin plugin) {
 		List<MetadataValue> values = object.getMetadata(key);  
 		for (MetadataValue value : values) {
 			if (value.getOwningPlugin() == plugin) {
@@ -66,7 +66,7 @@ public final class Compass extends JavaPlugin implements Listener {
 			data += "," + requester.getName();
 		}
 		setMetadata(toTrack, "compasstrackers", data, this);
-		
+
 		setMetadata(requester, "compasstracking", toTrack.getName(), this);
 	}
 	
@@ -130,12 +130,6 @@ public final class Compass extends JavaPlugin implements Listener {
 				case "help":
 					p.sendMessage(ChatColor.GOLD + "/compass [direction]" + ChatColor.GRAY + 
 							" - sets your compass direction to North, West, East or South.");
-					p.sendMessage(ChatColor.GOLD + "/compass pos <x> <y> <z>" + ChatColor.GRAY + 
-							" - sets your compass direction to the specific location.");
-					p.sendMessage(ChatColor.GOLD + "/compass pos current" + ChatColor.GRAY + " - sets your compass direction to your current position.");
-					p.sendMessage(ChatColor.GOLD + "/compass follow <player>" + ChatColor.GRAY + " - sets your compass direction to someone else's" +
-							" position. Keeps updating.");
-					//p.sendMessage(ChatColor.GOLD + "/compass about" + ChatColor.GRAY + " - views the info of the plugin.");
 					p.sendMessage(ChatColor.GOLD + "/compass bed" + ChatColor.GRAY + " - sets your compass to your bed's location");
 					p.sendMessage(ChatColor.GOLD + "To make your compass normal again, use /compass reset.");
 					p.sendMessage(ChatColor.GOLD + "To modify someone else's compass, use /setplayercompass and then anything listed here.");
@@ -148,69 +142,14 @@ public final class Compass extends JavaPlugin implements Listener {
 					String ver = pdf.getVersion();
 					String url = pdf.getWebsite();
 					String aut = pdf.getAuthors().get(0);
-					
-					if (sender instanceof Player) {	
-						p.sendMessage(ChatColor.AQUA + name + " " + ver);
-						p.sendMessage(ChatColor.GOLD + des);
-						p.sendMessage(ChatColor.GOLD + "Author: " + ChatColor.RESET + aut);
-						p.sendMessage(ChatColor.GOLD + "URL: " + ChatColor.RESET + url);
-					} else {
-						// TODO: Will never be true. Fix this. I'm lazy.
-						sender.sendMessage(name + " " + ver);
-						sender.sendMessage(des);
-						sender.sendMessage("Author: " + aut);
-						sender.sendMessage("URL: " + url);
-					}
+
+					p.sendMessage(ChatColor.AQUA + name + " " + ver);
+					p.sendMessage(ChatColor.GOLD + des);
+					p.sendMessage(ChatColor.GOLD + "Author: " + ChatColor.RESET + aut);
+					p.sendMessage(ChatColor.GOLD + "URL: " + ChatColor.RESET + url);
+
 					return true;
-					
-				case "follow":
-				case "f":
-					if (args.length < 2) {
-						p.sendMessage(ChatColor.RED + "Syntax error: Please enter a player to point to with your compass");
-						return false;
-					}
-					
-					Player toFollow = Bukkit.getServer().getPlayer(args[1]);
-					
-					if (toFollow != null) {
-						
-						p.setCompassTarget(toFollow.getLocation());
-						addTracker(p, toFollow);
-						p.sendMessage("You now follow " + toFollow.getName() + " with your compass!");
-						return true;						
-						
-					} else {
-						p.sendMessage(ChatColor.RED + "\"" + args[1] + "\" is not found on this server");
-						return false;
-					}
-					
-				case "pos":
-					if (args.length < 2) {
-						p.sendMessage(ChatColor.RED + "Usage: /compass pos current or /compass pos <x> <y> <z>");
-						return false;
-					}
-					if (args[1].toLowerCase().startsWith("c")) {
-						p.setCompassTarget(p.getLocation());						
-						p.sendMessage("Your compass is now pointing to your current location.");
-						return true;
-					}
-					if (args.length < 4) {
-						p.sendMessage(ChatColor.RED + "Usage: /compass pos current or /compass pos <x> <y> <z>");
-						return false;
-					}
-					
-					try {
-						int x = Integer.parseInt(args[1]);
-						int y = Integer.parseInt(args[2]);
-						int z = Integer.parseInt(args[3]);
-						p.setCompassTarget(p.getWorld().getBlockAt(x,y,z).getLocation());
-						p.sendMessage("Your compass is now pointing to " + x + ", " + y + ", " + z);
-						return true;
-					} catch (Exception ex) {
-						p.sendMessage("Failed to convert positions");
-						return false;
-					}	
-					
+
 				case "n":
 				case "north":
 					p.setCompassTarget(p.getWorld().getBlockAt((int)p.getLocation().getX(), 0, -12550820).getLocation());
@@ -278,53 +217,6 @@ public final class Compass extends JavaPlugin implements Listener {
 					// this is only hit when the first argument is a player
 					sender.sendMessage("/" + cmd.getName().toLowerCase() + " <player> <compass command>. See /compass help");
 					return true;
-				
-				case "f":
-				case "follow":
-					if (args.length < 3) {
-						sender.sendMessage("Syntax error: missing player to follow");
-						return false;
-					}
-					
-					Player toFollow = Bukkit.getServer().getPlayer(args[2]);
-					
-					if (toFollow == null) {
-						sender.sendMessage("Player \"" + args[2] + " not found");
-						return false;
-					}
-					
-					target.setCompassTarget(toFollow.getLocation());
-					addTracker(target, toFollow);
-					sender.sendMessage(target.getName() + "'s compass is now pointing to " + toFollow.getName());
-					return true;
-					
-				case "pos":
-					if (args.length < 2) {
-						sender.sendMessage("Syntax error: no location specified");
-						return false;
-					}
-					
-					if (args[2].toLowerCase().startsWith("c")) {
-						target.setCompassTarget(target.getLocation());
-						sender.sendMessage(target.getName() + "'s compass is now pointing to " + target.getName() + " current location");
-						return true;
-					}
-					if (args.length < 5) {
-						sender.sendMessage(ChatColor.RED + "Usage: /compass pos current or /compass pos <x> <y> <z>");
-						return false;
-					}
-					
-					try {
-						int x = Integer.parseInt(args[2]);
-						int y = Integer.parseInt(args[3]);
-						int z = Integer.parseInt(args[4]);
-						target.setCompassTarget(target.getWorld().getBlockAt(x,y,z).getLocation());
-						sender.sendMessage(target.getName() + "'s compass is now pointing to " + x + ", " + y + ", " + z);
-						return true;
-					} catch (Exception ex) {
-						sender.sendMessage("Failed to convert positions");
-						return false;
-					}
 					
 				case "n":
 				case "north":

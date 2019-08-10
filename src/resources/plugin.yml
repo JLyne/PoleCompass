@@ -1,0 +1,29 @@
+name: PoleCompass
+main: nl.function1.polepass.Compass
+description: A plugin where you can modify your compass!
+version: 2.0.4
+author: joppiesaus
+website: http://dev.bukkit.org/bukkit-plugins/joppiesaus-pass/
+
+commands:
+  compass:
+     permission: PoleCompass.compass
+     permission-message: You don't have the required permission to set your compass.
+     description: Points your compass to a specific pole!
+     usage: Use /compass help for help.
+  compass help:
+     permission: PoleCompass.compass.help
+     permission-message: You don't have the required permission for this command.
+     description: Views the help of PoleCompass.
+     usage: Use /compass help for help.
+  compass about:
+     permission: PoleCompass.compass.help
+     permission-message: You may not view the PoleCompass about page ;)
+     description: Displays info about PoleCompass
+     usage: /compass about
+  setplayercompass:
+     permission: PoleCompass.setplayercompass
+     permission-message: You don't have the required permission to modify other player's compasses.
+     description: Points someone's compass to a specific pole!
+     usage: Use /compass help for help.
+     

@@ -41,7 +41,7 @@
             <resource>
                 <targetPath>.</targetPath>
                 <filtering>true</filtering>
-                <directory>src/main/resources</directory>
+                <directory>src/resources</directory>
                 <includes>
                     <include>plugin.yml</include>
                 </includes>
