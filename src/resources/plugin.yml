@@ -26,4 +26,4 @@ commands:
      permission-message: You don't have the required permission to modify other player's compasses.
      description: Points someone's compass to a specific pole!
      usage: Use /compass help for help.
-     
+
