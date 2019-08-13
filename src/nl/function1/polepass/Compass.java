@@ -266,8 +266,6 @@ public class Compass extends JavaPlugin implements Listener {
 				return;
 		}
 
-		getLogger().info(location.toString());
-
 		player.setCompassTarget(location);
 	}
 	
